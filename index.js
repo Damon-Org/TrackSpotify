@@ -26,15 +26,18 @@ export default class TrackSpotify extends BaseModule {
         }
 
         const isAlbum = pathname.includes('/album/');
+        const isArtist = pathname.includes('/artist/');
         const data = isAlbum
             ? (await this.spotify.getAlbum(pathname.split('/album/')[1])).body
-            : (await this.spotify.getPlaylist(pathname.split('/playlist/')[1])).body;
+            : isArtist 
+                ? (await this.spotify.getArtistTopTracks(pathname.split('/artist/')[1])).body
+                : (await this.spotify.getPlaylist(pathname.split('/playlist/')[1])).body;
 
         const trackList = [];
 
-        data.tracks.items.forEach((item) => trackList.push(new SpotifyTrack(this._m, isAlbum ? item : item.track, isAlbum ? data.images[0].url : null)));
+        data.tracks.items.forEach((item) => trackList.push(new SpotifyTrack(this._m, (isAlbum || isArtist) ? item : item.track, isAlbum ? data.images[0].url : null)));
 
-        this._m.emit(isAlbum ? 'albumPlayed' : 'playlistPlayed');
+        this._m.emit(isAlbum ? 'albumPlayed' : isArtist ? 'artistPlayed' : 'playlistPlayed');
 
         return trackList;
     }
