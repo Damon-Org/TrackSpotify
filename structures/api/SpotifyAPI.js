@@ -53,6 +53,24 @@ export default class SpotifyAPI extends SpotifyWebAPI {
         return super.getAlbum(a1);
     }
 
+    async getArtistTopTracks(a1) {
+        await this._updateIfExpired();
+
+        const artistTopTracks = await super.getArtistTopTracks(a1, 'GB');
+        const artists = await super.getArtist(a1);
+
+        const topList = {
+            body: {
+                artists: artists.body,
+                tracks: {
+                    items: artistTopTracks.body.tracks
+                }
+            }
+        };
+
+        return topList;
+    }
+
     async getPlaylist(a1, offset = null, limit = 100) {
         await this._updateIfExpired();
 
