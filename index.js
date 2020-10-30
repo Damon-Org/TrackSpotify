@@ -12,7 +12,6 @@ export default class TrackSpotify extends BaseModule {
 
         this.register(TrackSpotify, {
             name: 'trackSpotify',
-            scope: 'global',
             requires: ['trackResolver']
         });
     }
@@ -34,10 +33,18 @@ export default class TrackSpotify extends BaseModule {
         const trackList = [];
 
         data.tracks.items.forEach((item) => trackList.push(new SpotifyTrack(this._m, isAlbum ? item : item.track, isAlbum ? data.images[0].url : null)));
-    
+
         this._m.emit(isAlbum ? 'albumPlayed' : 'playlistPlayed');
-        
+
         return trackList;
+    }
+
+    init() {
+        this.spotify = new SpotifyAPI(this._m, this.auth.credentials.api.spotify);
+
+        this.modules.trackResolver.registerResolver(this.name, HostNames);
+
+        return true;
     }
 
     /**
@@ -45,13 +52,5 @@ export default class TrackSpotify extends BaseModule {
      */
     resolve(url) {
         return this._resolve(url.pathname);
-    }
-
-    setup() {
-        this.spotify = new SpotifyAPI(this._m, this.auth.credentials.api.spotify);
-
-        this.modules.trackResolver.registerResolver(this.name, HostNames);
-
-        return true;
     }
 }
