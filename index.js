@@ -22,14 +22,14 @@ export default class TrackSpotify extends BaseModule {
      */
     async _resolve(pathname) {
         if (pathname.includes('/track/')) {
-            return new SpotifyTrack(this._m, (await this.spotify.getTrack(pathname.split('/track/')[1])).body);
+            return { type: 'song', data: new SpotifyTrack(this._m, (await this.spotify.getTrack(pathname.split('/track/')[1])).body)};
         }
 
         const isAlbum = pathname.includes('/album/');
         const isArtist = pathname.includes('/artist/');
         const data = isAlbum
             ? (await this.spotify.getAlbum(pathname.split('/album/')[1])).body
-            : isArtist 
+            : isArtist
                 ? (await this.spotify.getArtistTopTracks(pathname.split('/artist/')[1])).body
                 : (await this.spotify.getPlaylist(pathname.split('/playlist/')[1])).body;
 
@@ -39,7 +39,7 @@ export default class TrackSpotify extends BaseModule {
 
         this._m.emit(isAlbum ? 'albumPlayed' : isArtist ? 'artistPlayed' : 'playlistPlayed');
 
-        return trackList;
+        return { type: isAlbum ? 'album' : isArtist ? 'artist top 10' : 'playlist', data: trackList };
     }
 
     init() {
