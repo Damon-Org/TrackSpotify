@@ -11,7 +11,7 @@ export default class SpotifyTrack extends ResolvableTrack {
 
         Object.assign(this, {
             artists: data.artists,
-            cover: image ? image : data.album.images[0].url,
+            cover: image ? image : data.album?.images[0]?.url,
             name: data.name
         });
     }

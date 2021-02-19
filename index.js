@@ -35,7 +35,7 @@ export default class TrackSpotify extends BaseModule {
 
         const trackList = [];
 
-        data.tracks.items.forEach((item) => trackList.push(new SpotifyTrack(this._m, (isAlbum || isArtist) ? item : item.track, isAlbum ? data.images[0].url : null)));
+        data.tracks.items.forEach((item) => trackList.push(new SpotifyTrack(this._m, (isAlbum || isArtist) ? item : item.track, isAlbum ? data.images[0]?.url : null)));
 
         this._m.emit(isAlbum ? 'albumPlayed' : isArtist ? 'artistPlayed' : 'playlistPlayed');
 
