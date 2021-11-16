@@ -133,7 +133,7 @@ export default class ResolvableTrack {
         for (const result of results) {
             const data = await this._m.modules.lavalink.conn.getNode().rest.resolve(result.shareLink);
 
-            if (!data || !data instanceof Object) continue;
+            if (!data || !data instanceof Object || data.tracks.length === 0) continue;
 
             return data.tracks[0].track;
         }
