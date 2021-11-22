@@ -1,6 +1,5 @@
 import BaseModule from './structures/module/BaseModule.js'
 import SpotifyAPI from './structures/api/SpotifyAPI.js'
-import SpotifyTrack from './structures/track/SpotifyTrack.js'
 import { HostNames } from './util/Constants.js'
 
 export default class TrackSpotify extends BaseModule {
@@ -22,7 +21,7 @@ export default class TrackSpotify extends BaseModule {
      */
     async _resolve(pathname) {
         if (pathname.includes('/track/')) {
-            return { type: 'song', data: new SpotifyTrack(this._m, (await this.spotify.getTrack(pathname.split('/track/')[1])).body)};
+            return { type: 'song', data: new this.resolvableTrack(this._m, (await this.spotify.getTrack(pathname.split('/track/')[1])).body)};
         }
 
         const isAlbum = pathname.includes('/album/');
@@ -35,15 +34,17 @@ export default class TrackSpotify extends BaseModule {
 
         const trackList = [];
 
-        data.tracks.items.forEach((item) => trackList.push(new SpotifyTrack(this._m, (isAlbum || isArtist) ? item : item.track, isAlbum ? data.images[0]?.url : null)));
+        data.tracks.items.forEach((item) => trackList.push(new this.resolvableTrack(this._m, (isAlbum || isArtist) ? item : item.track, isAlbum ? data.images[0]?.url : null)));
 
         this._m.emit(isAlbum ? 'albumPlayed' : isArtist ? 'artistPlayed' : 'playlistPlayed');
 
         return { type: isAlbum ? 'album' : isArtist ? 'artist top 10' : 'playlist', data: trackList };
     }
 
-    init() {
+    async init() {
         this.spotify = new SpotifyAPI(this._m, this.auth.credentials.api.spotify);
+
+        this.resolvableTrack = (await import('./structures/track/SpotifyTrack.js')).default;
 
         this.modules.trackResolver.registerResolver(this.name, HostNames);
 

@@ -1,6 +1,6 @@
-import ResolvableTrack from './ResolvableTrack.js'
+import Modules from '@/src/Modules.js'
 
-export default class SpotifyTrack extends ResolvableTrack {
+export default class SpotifyTrack extends Modules.trackResolver.ResolvableTrack {
     /**
      * @param {Main} main
      * @param {Object} data
